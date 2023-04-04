@@ -7,11 +7,11 @@ env.read_env()
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
-ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', [])
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS')
 
-SECRET_KEY = env.str('SECRET_KEY', 'REPLACE_ME')
+SECRET_KEY = env.str('SECRET_KEY')
 
-DEBUG = env.bool('DEBUG', True)
+DEBUG = env.bool('DEBUG')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -63,8 +63,7 @@ WSGI_APPLICATION = 'sensive_blog.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': env.str(
-            'DATABASE_FILEPATH', os.path.join(BASE_DIR, 'db.sqlite3')),
+        'NAME': os.path.join(BASE_DIR, env.str('DB_FILEPATH')),
     }
 }
 
