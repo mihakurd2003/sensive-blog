@@ -1,14 +1,10 @@
 from django.db import models
-from django.db.models import Count
+from django.db.models import Count, Prefetch
 from django.urls import reverse
 from django.contrib.auth.models import User
 
 
 class PostQuerySet(models.QuerySet):
-
-    def year(self, year):
-        posts_at_year = self.filter(published_at__year=year).order_by('published_at')
-        return posts_at_year
 
     def popular(self):
         popular_posts = self.annotate(likes_count=Count('likes')).order_by('-likes_count')
@@ -25,6 +21,11 @@ class PostQuerySet(models.QuerySet):
 
         return posts
 
+    def get_prefetch_data_for_posts(self):
+        prefetch = self.prefetch_related('author', Prefetch('tags', queryset=Tag.objects.annotate(posts_count=Count('posts')).order_by('-posts_count')))
+
+        return prefetch
+
 
 class Post(models.Model):
     title = models.CharField('Заголовок', max_length=200)
@@ -37,7 +38,8 @@ class Post(models.Model):
         User,
         on_delete=models.CASCADE,
         verbose_name='Автор',
-        limit_choices_to={'is_staff': True}
+        limit_choices_to={'is_staff': True},
+        related_name='post'
     )
     likes = models.ManyToManyField(
         User,
